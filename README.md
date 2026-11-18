@@ -82,22 +82,32 @@ With `npm start` you must **re-run `npm run build` and `npm start` after every c
 
 ---
 
-## 4. Deploying online (optional, for use from your phone)
+## 4. Deploying online (Vercel)
 
-The app currently runs **only on your Mac**. It can be hosted for free on **Vercel**:
+Live at **https://flight-scanner-lac.vercel.app**. It redeploys automatically on every push to `main` on GitHub.
 
+### Secrets: where they live
+- API keys are **Vercel Environment Variables** marked **Sensitive**. They're encrypted at rest, only server
+  functions can read them, and nobody can view them again (not even you in the dashboard).
+- They are **never** in git, `.vercel/`, or the browser. `.vercel/` only holds project-link IDs, and both
+  `.env*` and `.vercel` are git-ignored.
+- The site is protected by a password (`APP_PASSWORD`, see `middleware.ts`). Your browser asks for it once.
+  Any username works. If a real key is set but `APP_PASSWORD` is missing, the site refuses to serve (fail-closed).
+
+### One-time setup
 ```bash
 cd ~/Tharun_Cert_Practice_Project
-npx vercel login                        # one-time
-npx vercel link                         # one-time: create the project
-npx vercel env add SERPAPI_KEY production   # paste your key when asked (one-time)
-npx vercel --prod                       # deploy; re-run this after every code change
+npx vercel login
+npx vercel link                                             # pick the existing "flight-scanner" project
+npx vercel env add SERPAPI_KEY production --sensitive       # paste key when prompted
+npx vercel env add APP_PASSWORD production --sensitive      # choose a strong password
+npx vercel env add MOCK production                          # enter 0
+npx vercel --prod                                           # redeploy so the new values take effect
 ```
+Paste values only at the prompt, never as a command argument, so they don't end up in shell history.
 
-⚠️ **Before deploying online, add a password.** Anyone who finds the URL could use up your SerpApi searches.
-This is **not set up yet**, so ask Claude to "add a login/password to the flight scanner" first.
-
-After each code change: run the checks in step 3b, then `npx vercel --prod`.
+### Rotating a key
+Regenerate it on serpapi.com, then `npx vercel env rm SERPAPI_KEY production`, add it again as above, and redeploy.
 
 ---
 

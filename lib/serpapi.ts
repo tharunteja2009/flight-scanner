@@ -77,7 +77,8 @@ export async function bookingOptions(p: SearchParams, bookingToken: string): Pro
 
 export async function accountInfo(): Promise<{ searchesLeft?: number; mock: boolean }> {
   if (isMock()) return { mock: true };
-  const res = await fetch(`https://serpapi.com/account.json?api_key=${process.env.SERPAPI_KEY}`, { cache: "no-store" });
+  const q = new URLSearchParams({ api_key: process.env.SERPAPI_KEY! });
+  const res = await fetch(`https://serpapi.com/account.json?${q}`, { cache: "no-store" });
   const data = await res.json().catch(() => ({}));
   return { searchesLeft: data.total_searches_left ?? data.plan_searches_left, mock: false };
 }
